@@ -1,0 +1,51 @@
+{
+  "title": "corefn",
+  "type": "object",
+  "patternProperties": {
+    "^[A-Z]\\w*(\\.[A-Z]\\w*)*$": {
+      "type": "object",
+      "properties": {
+        "imports": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]\\w*(\\.[A-Z]\\w*)*$"
+          }
+        },
+        "exports": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "foreign": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "decls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+
+            }
+          }
+        },
+        "builtWith": {
+          "type": "string",
+          "pattern": "\\d+\\.\\d+\\.\\d+"
+        }
+      },
+      "required": [
+        "imports",
+        "exports",
+        "foreign",
+        "decls",
+        "builtWith"
+      ]
+    }
+  },
+  "additionalProperties": false
+}
