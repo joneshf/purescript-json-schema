@@ -28,8 +28,38 @@
           "type": "array",
           "items": {
             "type": "object",
-            "properties": {
-
+            "patternProperties": {
+              "^[\\w\\d_]+$": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/var"
+                  },
+                  {
+                    "$ref": "#/definitions/literal"
+                  },
+                  {
+                    "$ref": "#/definitions/constructor"
+                  },
+                  {
+                    "$ref": "#/definitions/accessor"
+                  },
+                  {
+                    "$ref": "#/definitions/objectUpdate"
+                  },
+                  {
+                    "$ref": "#/definitions/abs"
+                  },
+                  {
+                    "$ref": "#/definitions/app"
+                  },
+                  {
+                    "$ref": "#/definitions/case"
+                  },
+                  {
+                    "$ref": "#/definitions/let"
+                  }
+                ]
+              }
             }
           }
         },
@@ -47,5 +77,479 @@
       ]
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "definitions": {
+    "expr": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/var"
+        },
+        {
+          "$ref": "#/definitions/literal"
+        },
+        {
+          "$ref": "#/definitions/constructor"
+        },
+        {
+          "$ref": "#/definitions/accessor"
+        },
+        {
+          "$ref": "#/definitions/objectUpdate"
+        },
+        {
+          "$ref": "#/definitions/abs"
+        },
+        {
+          "$ref": "#/definitions/app"
+        },
+        {
+          "$ref": "#/definitions/case"
+        },
+        {
+          "$ref": "#/definitions/let"
+        }
+      ]
+    },
+    "var": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["Var"]
+        },
+        {
+          "type": "string",
+          "pattern": "^\\w[\\w\\d_]*(\\.[A-Z][\\w\\d_]*)*$"
+        }
+      ],
+      "additionalItems": false
+    },
+    "literal": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["Literal"]
+        },
+        {
+          "$ref": "#/definitions/exprLiteral"
+        }
+      ],
+      "additionalItems": false
+    },
+    "constructor": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["Constructor"]
+        },
+        {
+          "type": "string",
+          "pattern": "[A-Z][\\w\\d_]*"
+        },
+        {
+          "type": "string",
+          "pattern": "[A-Z][\\w\\d_]*"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "[a-z][\\w\\d_]*"
+          }
+        }
+      ],
+      "additionalItems": false
+    },
+    "accessor": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["Accessor"]
+        },
+        {
+          "type": "string",
+          "pattern": "[a-z][\\w\\d_]*"
+        }
+      ],
+      "additionalItems": false
+    },
+    "objectUpdate": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["ObjectUpdate"]
+        },
+        {
+          "$ref": "#/definitions/expr"
+        },
+        {
+          "$ref": "#/definitions/record"
+        }
+      ],
+      "additionalItems": false
+    },
+    "abs": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["Abs"]
+        },
+        {
+          "type": "string",
+          "pattern": "^[a-z_][\\w\\d_]*$"
+        },
+        {
+          "$ref": "#/definitions/expr"
+        }
+      ],
+      "additionalItems": false
+    },
+    "app": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["App"]
+        },
+        {
+          "$ref": "#/definitions/expr"
+        },
+        {
+          "$ref": "#/definitions/expr"
+        }
+      ],
+      "additionalItems": false
+    },
+    "case": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["Case"]
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/expr"
+          },
+          "minItems": 1
+        },
+        {
+          "$ref": "#/definitions/caseAlternative"
+        }
+      ],
+      "additionalItems": false
+    },
+    "let": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["Let"]
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/bind"
+          }
+        },
+        {
+          "$ref": "#/definitions/expr"
+        }
+      ],
+      "additionalItems": false
+    },
+    "caseAlternative": {
+      "type": "array",
+      "items": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/binder"
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/guardedExpr"
+                }
+              },
+              {
+                "$ref": "#/definitions/expr"
+              }
+            ]
+          }
+        }
+      ],
+      "additionalItems": false
+    },
+    "binder": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/varBinder"
+        },
+        {
+          "$ref": "#/definitions/nullBinder"
+        },
+        {
+          "$ref": "#/definitions/literalBinder"
+        },
+        {
+          "$ref": "#/definitions/constructorBinder"
+        },
+        {
+          "$ref": "#/definitions/namedBinder"
+        }
+      ]
+    },
+    "varBinder": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["VarBinder"]
+        },
+        {
+          "type": "string",
+          "pattern": "^\\w[\\w\\d_]*(\\.[A-Z][\\w\\d_]*)*$"
+        }
+      ],
+      "additionalItems": false
+    },
+    "nullBinder": {
+      "type": "string",
+      "enum": ["NullBinder"]
+    },
+    "literalBinder": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["LiteralBinder"]
+        },
+        {
+          "$ref": "#/definitions/literal"
+        }
+      ],
+      "additionalItems": false
+    },
+    "constructorBinder": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["ConstructorBinder"]
+        },
+        {
+          "type": "string",
+          "pattern": "[A-Z][\\w\\d_]*"
+        },
+        {
+          "type": "string",
+          "pattern": "[A-Z][\\w\\d_]*"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/binder"
+          }
+        }
+      ],
+      "additionalItems": false
+    },
+    "namedBinder": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["NamedBinder"]
+        },
+        {
+          "type": "string",
+          "pattern": "^\\w[\\w\\d_]*(\\.[A-Z][\\w\\d_]*)*$"
+        },
+        {
+          "$ref": "#/definitions/binder"
+        }
+      ],
+      "additionalItems": false
+    },
+    "guardedExpr": {
+      "type": "array",
+      "items": [
+        {
+          "$ref": "#/definitions/expr"
+        },
+        {
+          "$ref": "#/definitions/expr"
+        }
+      ],
+      "additionalItems": false
+    },
+    "bind": {
+      "type": "object",
+      "patternProperties": {
+        "^\\w[\\w\\d_]*(\\.[A-Z][\\w\\d_]*)*$": {
+          "$ref": "#/definitions/expr"
+        }
+      },
+      "minProperties": 1
+    },
+    "record": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/recordAsObject"
+        },
+        {
+          "$ref": "#/definitions/recordAsArray"
+        }
+      ]
+    },
+    "recordAsObject": {
+      "type": "object",
+      "patternProperties": {
+        "^.+$": {
+          "$ref": "#/definitions/expr"
+        }
+      }
+    },
+    "recordAsArray": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": [
+          {
+            "type": "string",
+            "pattern": "^\\w[\\w\\d_]*(\\.[A-Z][\\w\\d_]*)*$"
+          },
+          {
+            "$ref": "#/definitions/expr"
+          }
+        ]
+      }
+    },
+    "exprLiteral": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/intLiteral"
+        },
+        {
+          "$ref": "#/definitions/numberLiteral"
+        },
+        {
+          "$ref": "#/definitions/stringLiteral"
+        },
+        {
+          "$ref": "#/definitions/charLiteral"
+        },
+        {
+          "$ref": "#/definitions/booleanLiteral"
+        },
+        {
+          "$ref": "#/definitions/arrayLiteral"
+        },
+        {
+          "$ref": "#/definitions/objectLiteral"
+        }
+      ]
+    },
+    "intLiteral": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["IntLiteral"]
+        },
+        {
+          "type": "integer"
+        }
+      ]
+    },
+    "numberLiteral": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["NumberLiteral"]
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "stringLiteral": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["StringLiteral"]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "charLiteral": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["CharLiteral"]
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1
+        }
+      ]
+    },
+    "booleanLiteral": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["BooleanLiteral"]
+        },
+        {
+          "type": "boolean"
+        }
+      ]
+    },
+    "arrayLiteral": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["ArrayLiteral"]
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/expr"
+          }
+        }
+      ]
+    },
+    "objectLiteral": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": ["ObjectLiteral"]
+        },
+        {
+          "$ref": "#/definitions/record"
+        }
+      ]
+    }
+  }
 }
